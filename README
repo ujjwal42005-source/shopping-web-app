@@ -1,0 +1,20 @@
+# Shopping Web Application
+
+## Overview
+A full-stack e-commerce web application with multiple user roles (Admin, Vendor, Customer).
+
+## Features
+- User Authentication (Admin, Vendor, Customer)
+- Product Management
+- Cart System
+- Dashboard Views
+
+## Tech Stack
+- Python (Flask)
+- MySQL
+- HTML, CSS, JavaScript
+
+## How to Run
+1. Install dependencies: pip install flask pymysql
+2. Setup MySQL database
+3. Run: python app.py

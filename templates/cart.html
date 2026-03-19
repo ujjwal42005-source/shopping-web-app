@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cart</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        background: linear-gradient(to left, #6e3ea5, #44778f);
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .translucent-table-container {
+        position: relative;
+    }
+    
+    .translucent-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Black color with 50% opacity */
+        backdrop-filter: blur(10px); /* Apply a blur effect */
+        -webkit-backdrop-filter: blur(10px);
+        z-index: 1;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        z-index: 2; /* Ensure the table is above the overlay */
+        position: relative; /* Ensure the table is stacked above the overlay */
+        color: white;
+    }
+
+    th, td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    .order-btn, .home-btn, .continue-btn, .remove-btn {
+        display: block;
+        width: 200px;
+        margin: 0 auto;
+        padding: 10px;
+        text-align: center;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+        margin-bottom: 10px;
+    }
+
+    .order-btn {
+        background-color: #007bff;
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .order-btn:hover {
+        background-color: #0056b3;
+    }
+
+    .home-btn, .continue-btn, .remove-btn {
+        background-color: #f2f2f2;
+        color: #000;
+        text-decoration: none;
+        border: 1px solid #ddd;
+    }
+
+    .home-btn:hover, .continue-btn:hover, .remove-btn:hover {
+        background-color: #ddd;
+    }
+
+    .selected {
+        background-color: #e6f7ff;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    
+    <h1>Shopping Cart</h1>
+
+    <div class="translucent-table-container">
+        <div class="translucent-overlay"></div>
+        <table class="table" id="carttable">
+            <thead>
+                <tr>
+                    <th>Item_id</th>
+                    <th>Item_name</th>
+                    <th>stock</th>
+                    <th>Item_price</th>
+                    <th>vendor_id</th>
+                    <th>category_id</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Sample cart items -->
+                <tr>
+                </tr>
+                <!-- Add more rows for other items -->
+            </tbody>
+        </table>
+    </div>
+
+    <a href="#" class="order-btn" onclick="order_button_click()">Order Now</a>
+    <a href="#" class="home-btn" onclick="goTohome()">Home</a>
+    <a href="#" class="continue-btn" onclick="goToshop()">Continue Shopping</a>
+    <a href="#" class="remove-btn">Remove Item</a>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="{{ url_for('static', filename='tablemanage.js') }}"></script>
+<script>
+
+    const tableid="carttable";
+    const page="cart";
+    var orderdata;
+    maketable();
+
+    async function order_button_click(){        
+        var resp= await $.ajax({
+            type: "POST",
+            url: '/orderitem',  // Flask route for handling button click
+            contentType: "application/json", // Set content type to JSON
+            data: JSON.stringify({orders:orderdata}), 
+            success: function(response) {
+            // Handle the response from the Flask backend
+                console.log(response);
+            }   
+
+        });
+    }
+
+    function goToshop() {
+        window.location.href = "/gotoshop";
+    }
+
+    
+    function goTohome() {
+        window.location.href = "/gotohome";
+    }
+
+    async function maketable()
+    {
+        console.log("came here")
+        var resp=await searchTable(tableid,"",page);
+        changedataTable(resp["res"],resp["tn"]);
+        orderdata=resp["res"];
+    }
+    // JavaScript for removing item functionality
+    document.querySelectorAll('.cart-item').forEach(item => {
+        item.addEventListener('click', () => {
+            item.classList.toggle('selected');
+        });
+    });
+
+    // JavaScript for remove item button
+    document.querySelector('.remove-btn').addEventListener('click', () => {
+        const selectedItems = document.querySelectorAll('.selected');
+        if (selectedItems.length > 0) {
+            selectedItems.forEach(item => {
+                item.parentElement.removeChild(item);
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
